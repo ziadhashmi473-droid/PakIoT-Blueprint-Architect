@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@media print {
+  #main-header,
+  #project-input-container,
+  #toggle-full-view-btn,
+  #consult-engineer-btn,
+  #export-markdown-btn,
+  #print-blueprint-btn {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  section {
+    page-break-inside: avoid;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    margin-bottom: 2rem !important;
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "PakIoT Blueprint Architect",
+  "description": "Embedded systems and IoT engineering blueprint generator with Pakistani market sourcing (PKR), wiring safety, Mermaid architecture, firmware, and DMM calibration protocols.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
