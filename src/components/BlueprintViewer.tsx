@@ -17,6 +17,7 @@ import {
   Maximize2,
   Minimize2,
   Sliders,
+  TrendingUp,
 } from "lucide-react";
 import { EngineeringBlueprint } from "../types";
 import { BomTable } from "./BomTable";
@@ -24,19 +25,21 @@ import { MermaidDiagram } from "./MermaidDiagram";
 import { FirmwareViewer } from "./FirmwareViewer";
 import { DmmChecklist } from "./DmmChecklist";
 import { DeviceInterfaceDashboard } from "./DeviceInterfaceDashboard";
+import { SafetyFirstModal } from "./SafetyFirstModal";
 
 interface BlueprintViewerProps {
   blueprint: EngineeringBlueprint;
 }
 
 export function BlueprintViewer({ blueprint }: BlueprintViewerProps) {
-  const [activeTab, setActiveTab] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState<number>(2);
   const [fullView, setFullView] = useState<boolean>(false);
+  const [isSafetyModalOpen, setIsSafetyModalOpen] = useState<boolean>(false);
 
   const sections = [
     { id: 0, name: "⚡ Live Device Interface (HMI)", icon: Sliders },
     { id: 1, name: "1. Executive Summary", icon: FileText },
-    { id: 2, name: "2. Local Pakistani BOM", icon: DollarSign },
+    { id: 2, name: "2. BOM & Cost Chart", icon: DollarSign },
     { id: 3, name: "3. Wiring & Safety", icon: ShieldAlert },
     { id: 4, name: "4. System Flow (Mermaid)", icon: GitFork },
     { id: 5, name: "5. Production Firmware", icon: Code2 },
@@ -91,6 +94,33 @@ export function BlueprintViewer({ blueprint }: BlueprintViewerProps) {
                 {blueprint.targetMCU}
               </span>
             </div>
+
+            <button
+              id="header-open-safety-modal-btn"
+              onClick={() => setIsSafetyModalOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-rose-300 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-800 hover:bg-rose-100 hover:border-rose-400 transition-all shadow-2xs"
+              title="Open Critical DMM & Wiring Safety Rules Overlay"
+            >
+              <ShieldAlert className="h-4 w-4 text-rose-600 animate-pulse" />
+              <span>Safety First</span>
+            </button>
+
+            <button
+              id="header-open-bom-chart-btn"
+              onClick={() => {
+                setActiveTab(2);
+                setFullView(false);
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all ${
+                activeTab === 2 && !fullView
+                  ? "bg-slate-900 text-white shadow-xs"
+                  : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+              }`}
+              title="View BOM Table & Category Cost Breakdown Chart"
+            >
+              <TrendingUp className="h-4 w-4 text-emerald-600" />
+              <span>BOM & Cost Chart</span>
+            </button>
 
             <button
               id="header-open-device-interface-btn"
@@ -152,7 +182,10 @@ export function BlueprintViewer({ blueprint }: BlueprintViewerProps) {
         {/* SECTION 0: INTERACTIVE DEVICE INTERFACE & LIVE WEB/MOBILE HMI */}
         {(fullView || activeTab === 0) && (
           <section id="section-0-interface">
-            <DeviceInterfaceDashboard blueprint={blueprint} />
+            <DeviceInterfaceDashboard
+              blueprint={blueprint}
+              onOpenSafetyModal={() => setIsSafetyModalOpen(true)}
+            />
           </section>
         )}
 
@@ -232,9 +265,19 @@ export function BlueprintViewer({ blueprint }: BlueprintViewerProps) {
 
             {/* Safety Rules Box */}
             <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50/60 p-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-rose-900 mb-2 flex items-center gap-1.5">
-                <ShieldAlert className="h-4 w-4 text-rose-600" /> Strict Hardware Safety & Isolation Rules
-              </h4>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-rose-900 flex items-center gap-1.5">
+                  <ShieldAlert className="h-4 w-4 text-rose-600" /> Strict Hardware Safety & Isolation Rules
+                </h4>
+                <button
+                  type="button"
+                  onClick={() => setIsSafetyModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-rose-300 bg-white px-2.5 py-1 text-xs font-bold text-rose-800 hover:bg-rose-50 transition-colors self-start sm:self-auto shadow-2xs"
+                >
+                  <ShieldAlert className="h-3.5 w-3.5 text-rose-600" />
+                  <span>Launch Safety First Overlay</span>
+                </button>
+              </div>
               <ul className="space-y-1.5 text-xs text-rose-800">
                 {blueprint.section3_wiringAndSafety.safetyRules.map((rule, idx) => (
                   <li key={idx} className="flex items-start gap-2">
@@ -354,6 +397,7 @@ export function BlueprintViewer({ blueprint }: BlueprintViewerProps) {
             <DmmChecklist
               testPoints={blueprint.section6_dmmProtocols.dmmChecklist}
               troubleshooting={blueprint.section6_dmmProtocols.troubleshooting}
+              onOpenSafetyModal={() => setIsSafetyModalOpen(true)}
             />
           </section>
         )}
@@ -557,6 +601,13 @@ export function BlueprintViewer({ blueprint }: BlueprintViewerProps) {
           </section>
         )}
       </div>
+
+      {/* Interactive Safety First Modal Overlay */}
+      <SafetyFirstModal
+        isOpen={isSafetyModalOpen}
+        onClose={() => setIsSafetyModalOpen(false)}
+        blueprint={blueprint}
+      />
     </div>
   );
 }

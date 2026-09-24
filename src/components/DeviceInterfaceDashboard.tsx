@@ -22,6 +22,7 @@ import {
   Cpu,
   Clock,
   Radio,
+  ShieldAlert,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -36,6 +37,7 @@ import { EngineeringBlueprint } from "../types";
 
 interface DeviceInterfaceDashboardProps {
   blueprint: EngineeringBlueprint;
+  onOpenSafetyModal?: () => void;
 }
 
 interface TelemetryPoint {
@@ -45,7 +47,10 @@ interface TelemetryPoint {
   relayActive: boolean;
 }
 
-export function DeviceInterfaceDashboard({ blueprint }: DeviceInterfaceDashboardProps) {
+export function DeviceInterfaceDashboard({
+  blueprint,
+  onOpenSafetyModal,
+}: DeviceInterfaceDashboardProps) {
   // View mode: Web SCADA vs Mobile App HMI vs ESP32 Code
   const [viewMode, setViewMode] = useState<"desktop" | "mobile" | "code">("desktop");
   
@@ -448,47 +453,61 @@ void loop() {
             </p>
           </div>
 
-          {/* Mode Switcher Tabs */}
-          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 p-1 self-start lg:self-auto">
-            <button
-              id="hmi-mode-desktop"
-              type="button"
-              onClick={() => setViewMode("desktop")}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
-                viewMode === "desktop"
-                  ? "bg-white text-slate-900 shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              <Monitor className="h-3.5 w-3.5 text-emerald-600" />
-              <span>Web SCADA</span>
-            </button>
-            <button
-              id="hmi-mode-mobile"
-              type="button"
-              onClick={() => setViewMode("mobile")}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
-                viewMode === "mobile"
-                  ? "bg-white text-slate-900 shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              <Smartphone className="h-3.5 w-3.5 text-emerald-600" />
-              <span>Mobile Phone HMI</span>
-            </button>
-            <button
-              id="hmi-mode-code"
-              type="button"
-              onClick={() => setViewMode("code")}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
-                viewMode === "code"
-                  ? "bg-white text-slate-900 shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              <Code2 className="h-3.5 w-3.5 text-emerald-600" />
-              <span>ESP32 WebServer Code</span>
-            </button>
+          {/* Mode Switcher Tabs & Safety First Button */}
+          <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto">
+            {onOpenSafetyModal && (
+              <button
+                type="button"
+                onClick={onOpenSafetyModal}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-rose-300 bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-800 hover:bg-rose-100 hover:border-rose-400 transition-colors shadow-2xs"
+                title="Open Critical DMM & Wiring Safety Rules Overlay"
+              >
+                <ShieldAlert className="h-3.5 w-3.5 text-rose-600 animate-pulse" />
+                <span>Safety First</span>
+              </button>
+            )}
+
+            <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 p-1">
+              <button
+                id="hmi-mode-desktop"
+                type="button"
+                onClick={() => setViewMode("desktop")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+                  viewMode === "desktop"
+                    ? "bg-white text-slate-900 shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <Monitor className="h-3.5 w-3.5 text-emerald-600" />
+                <span>Web SCADA</span>
+              </button>
+              <button
+                id="hmi-mode-mobile"
+                type="button"
+                onClick={() => setViewMode("mobile")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+                  viewMode === "mobile"
+                    ? "bg-white text-slate-900 shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <Smartphone className="h-3.5 w-3.5 text-emerald-600" />
+                <span>Mobile Phone HMI</span>
+              </button>
+              <button
+                id="hmi-mode-code"
+                type="button"
+                onClick={() => setViewMode("code")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+                  viewMode === "code"
+                    ? "bg-white text-slate-900 shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <Code2 className="h-3.5 w-3.5 text-emerald-600" />
+                <span>ESP32 WebServer Code</span>
+              </button>
+            </div>
           </div>
         </div>
 

@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { CheckSquare, Square, AlertTriangle, HelpCircle, CheckCircle2 } from "lucide-react";
+import { CheckSquare, Square, AlertTriangle, HelpCircle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { DmmTestPoint, TroubleshootingItem } from "../types";
 
 interface DmmChecklistProps {
   testPoints: DmmTestPoint[];
   troubleshooting: TroubleshootingItem[];
+  onOpenSafetyModal?: () => void;
 }
 
-export function DmmChecklist({ testPoints, troubleshooting }: DmmChecklistProps) {
+export function DmmChecklist({ testPoints, troubleshooting, onOpenSafetyModal }: DmmChecklistProps) {
   const [checkedPoints, setCheckedPoints] = useState<Record<number, boolean>>({});
 
   const toggleCheck = (idx: number) => {
@@ -25,8 +26,8 @@ export function DmmChecklist({ testPoints, troubleshooting }: DmmChecklistProps)
     <div className="space-y-6">
       {/* Bench DMM Progress Bar */}
       <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="font-semibold text-xs text-slate-800 uppercase tracking-wider">
               Multimeter Bench Verification Progress
             </span>
@@ -34,7 +35,21 @@ export function DmmChecklist({ testPoints, troubleshooting }: DmmChecklistProps)
               {completedCount} of {totalCount} Verified
             </span>
           </div>
-          <span className="text-xs font-bold text-slate-700">{progressPercent}% Passed</span>
+
+          <div className="flex items-center gap-2.5">
+            {onOpenSafetyModal && (
+              <button
+                type="button"
+                onClick={onOpenSafetyModal}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-800 hover:bg-rose-100 transition-colors shadow-2xs"
+                title="Launch Safety First overlay"
+              >
+                <ShieldAlert className="h-3.5 w-3.5 text-rose-600" />
+                <span>Safety First Overlay</span>
+              </button>
+            )}
+            <span className="text-xs font-bold text-slate-700">{progressPercent}% Passed</span>
+          </div>
         </div>
         <div className="h-2 w-full rounded-full bg-slate-200 overflow-hidden">
           <div
